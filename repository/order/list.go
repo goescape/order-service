@@ -9,20 +9,23 @@ import (
 const (
 	GetOrderList = `
 	SELECT
-	COUNT(*) OVER() AS total_data,
-    o.id AS order_id,
-    o.user_id AS user_id,
-    o.total_price AS total_price,
-    o.created_at AS created_at,
-    o.updated_at AS updated_at,
-    od.id AS detail_id,
-    od.product_id AS product_id,
-    od.qty AS qty,
-    od.price AS price,
+		COUNT(*) OVER() AS total_data,
+		o.id AS order_id,
+		o.user_id AS user_id,
+		o.total_price AS total_price,
+		o.created_at AS created_at,
+		o.updated_at AS updated_at,
+		od.id AS detail_id,
+		od.product_id AS product_id,
+		od.qty AS qty,
+		od.price AS price
 	FROM orders o
-	LEFT JOIN order_details od ON o.id = od.order_id
-	where o.user_id = $1
-	ORDER BY o.created_at DESC
+	LEFT JOIN
+		order_details od ON o.id = od.order_id
+	WHERE
+		o.user_id = $1
+	ORDER BY
+		o.created_at DESC
 	LIMIT $2 OFFSET $3;
 	`
 )
@@ -34,7 +37,7 @@ func (s *orderStore) GetOrderList(ctx context.Context, req *model.GetOrderListRe
 		resp      = new(model.ListOrderResponse)
 	)
 
-	rows, err := s.db.QueryContext(ctx, GetOrderList, req.Limit, (req.Page-1)*req.Limit)
+	rows, err := s.db.QueryContext(ctx, GetOrderList, req.UserId, req.Limit, (req.Page-1)*req.Limit)
 	if err != nil {
 		log.Default().Println("failed to query GetOrderList:", err)
 		return nil, err

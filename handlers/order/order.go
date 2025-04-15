@@ -60,13 +60,17 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 func (h *OrderHandler) GetOrderList(c *gin.Context) {
 	var req model.GetOrderListRequest
 
-	if err := c.ShouldBindQuery(&req); err != nil {
-		fault.Response(c, fault.Custom(
-			400,
-			fault.ErrBadRequest,
-			fmt.Sprintf("failed to bind query: %v", err),
-		))
-		return
+	userId := c.DefaultQuery("user_id", "")
+	if userId != "" {
+		req.UserId = &userId
+	}
+
+	if req.Page < 1 {
+		req.Page = 1
+	}
+
+	if req.Limit < 1 {
+		req.Limit = 10
 	}
 
 	resp, err := h.service.GetOrderList(c.Request.Context(), &req)

@@ -38,6 +38,11 @@ func (r *Routes) configureUserRoutes(router *gin.RouterGroup) {
 	userGroup.POST("/login", r.User.HandleUserLogin)
 }
 
+func (r *Routes) configureOrderRoutes(router *gin.RouterGroup) {
+	orderGroup := router.Group("/order")
+
+}
+
 func (r *Routes) Run(port string) {
 	if r.Router == nil {
 		panic("[ROUTER ERROR] Gin Engine has not been initialized. Make sure to call Setup() before Run().")

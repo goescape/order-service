@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"order-svc/config"
-	handlers "order-svc/handlers/user"
-	repository "order-svc/repository/user"
+	handlers "order-svc/handlers/order"
+	repository "order-svc/repository/order"
 	"order-svc/routes"
-	usecases "order-svc/usecases/user"
+	usecases "order-svc/usecases/order"
 )
 
 func main() {
@@ -27,11 +27,11 @@ func main() {
 }
 
 func initDepedencies(db *sql.DB) *routes.Routes {
-	userRepo := repository.NewUserStore(db)
-	userUC := usecases.NewUserUsecase(userRepo)
-	userHandler := handlers.NewUserHandler(userUC)
+	orderRepo := repository.NewOrderRepository(db)
+	orderUsecase := usecases.NewOrderUsecase(orderRepo)
+	orderHandler := handlers.NewOrderHandler(orderUsecase)
 
 	return &routes.Routes{
-		User: userHandler,
+		OrderHandler: orderHandler,
 	}
 }

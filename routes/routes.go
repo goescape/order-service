@@ -2,7 +2,7 @@ package routes
 
 import (
 	"fmt"
-	handlers "order-svc/handlers/user"
+	orderHandlers "order-svc/handlers/order"
 	"order-svc/middlewares"
 	"strings"
 
@@ -11,7 +11,8 @@ import (
 
 type Routes struct {
 	Router *gin.Engine
-	User   *handlers.UserHandler
+
+	OrderHandler *orderHandlers.OrderHandler
 }
 
 func (r *Routes) Setup(baseURL string) {
@@ -29,18 +30,13 @@ func (r *Routes) Setup(baseURL string) {
 
 func (r *Routes) setupAPIRoutes(baseURL string) {
 	apiGroup := r.Router.Group(baseURL)
-	r.configureUserRoutes(apiGroup)
-}
-
-func (r *Routes) configureUserRoutes(router *gin.RouterGroup) {
-	userGroup := router.Group("/user")
-	userGroup.POST("/register", r.User.HandleUserRegister)
-	userGroup.POST("/login", r.User.HandleUserLogin)
+	r.configureOrderRoutes(apiGroup)
 }
 
 func (r *Routes) configureOrderRoutes(router *gin.RouterGroup) {
 	orderGroup := router.Group("/order")
 
+	orderGroup.POST("/create", r.OrderHandler.CreateOrder)
 }
 
 func (r *Routes) Run(port string) {

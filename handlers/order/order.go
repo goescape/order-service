@@ -54,7 +54,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	response.JSON(c, 200, "Success", resp)
+	c.JSON(200, resp)
 }
 
 func (h *OrderHandler) GetOrderList(c *gin.Context) {

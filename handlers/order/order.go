@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"order-svc/helpers/fault"
+	"order-svc/helpers/response"
 	"order-svc/model"
 	usecases "order-svc/usecases/order"
 
@@ -31,4 +32,11 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
+	resp, err := h.service.CreateOrder(c.Request.Context(), &req)
+	if err != nil {
+		fault.Response(c, err)
+		return
+	}
+
+	response.JSON(c, 200, "Success", resp)
 }

@@ -37,6 +37,7 @@ func (r *Routes) configureOrderRoutes(router *gin.RouterGroup) {
 	orderGroup := router.Group("/order")
 
 	orderGroup.POST("/create", r.OrderHandler.CreateOrder)
+	orderGroup.GET("/list", r.OrderHandler.GetOrderList)
 }
 
 func (r *Routes) Run(port string) {

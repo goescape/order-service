@@ -1,5 +1,5 @@
 BASE_URL_PATH: api
-PORT: 8080
+PORT: 7070
 RPC_PORT: 8090
 
 DB_HOST: localhost

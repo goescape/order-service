@@ -23,10 +23,9 @@ type userUsecase struct {
 	redis *redis.Client
 }
 
-func NewUserUsecase(repository repository.UserRepository, redis *redis.Client) *userUsecase {
+func NewUserUsecase(repository repository.UserRepository) *userUsecase {
 	return &userUsecase{
-		user:  repository,
-		redis: redis,
+		user: repository,
 	}
 }
 

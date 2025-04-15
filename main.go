@@ -7,9 +7,6 @@ import (
 	repository "order-svc/repository/user"
 	"order-svc/routes"
 	usecases "order-svc/usecases/user"
-
-	"github.com/redis/go-redis/v9"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -24,25 +21,14 @@ func main() {
 	}
 	defer db.Close()
 
-	redis, err := config.InitRedis(cfg.Redis)
-	if err != nil {
-		return
-	}
-	defer redis.Close()
-
-	rpc, err := config.RPCDial(cfg.Grpc)
-	if err != nil {
-		return
-	}
-
-	routes := initDepedencies(db, rpc, redis)
+	routes := initDepedencies(db)
 	routes.Setup(cfg.BaseURL)
 	routes.Run(cfg.Port)
 }
 
-func initDepedencies(db *sql.DB, rpc *grpc.ClientConn, redis *redis.Client) *routes.Routes {
+func initDepedencies(db *sql.DB) *routes.Routes {
 	userRepo := repository.NewUserStore(db)
-	userUC := usecases.NewUserUsecase(userRepo, redis)
+	userUC := usecases.NewUserUsecase(userRepo)
 	userHandler := handlers.NewUserHandler(userUC)
 
 	return &routes.Routes{

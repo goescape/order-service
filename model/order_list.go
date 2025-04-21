@@ -84,3 +84,11 @@ func MapOrderModelsToResponse(models []*OrderModel) []*OrderResponse {
 
 	return responses
 }
+
+type CancelOrderModel struct {
+	ID string `json:"order_id" db:"order_id"`
+}
+
+type PayOrderModel struct {
+	ID string `json:"order_id" db:"order_id"`
+}

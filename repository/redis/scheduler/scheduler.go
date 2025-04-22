@@ -58,7 +58,7 @@ func (s *bookingSchedulerService) ScheduleTaskCancellation(orderID string) error
 	ctx := context.Background()
 	key := fmt.Sprintf("task:%s:expire", orderID) // Format key unik untuk Redis
 
-	ttl := 20 * time.Second
+	ttl := 60 * time.Second
 
 	// Menyimpan key di Redis dengan TTL sekian waktu
 	err := s.redisClient.SetEX(ctx, key, orderID, ttl).Err()

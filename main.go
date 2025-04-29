@@ -10,6 +10,7 @@ import (
 	redisRepo "order-svc/repository/redis/scheduler"
 	"order-svc/routes"
 	usecases "order-svc/usecases/order"
+	"strings"
 
 	"github.com/go-redis/redis/v8"
 
@@ -37,15 +38,16 @@ func main() {
 
 	kafkaInstance, err := kafkaBroker.NewKafkaConsumer(cfg.Kafka) // Ganti dengan alamat broker Kafka Anda
 	if err != nil {
+		log.Default().Println("[Error] - Failed to initialize Kafka:", err)
 		log.Fatalf("Failed to initialize Kafka: %s", err)
 	}
 
-	routes := initDepedencies(db, redisSv, kafkaInstance)
+	routes := initDepedencies(cfg, db, redisSv, kafkaInstance)
 	routes.Setup(cfg.BaseURL)
 	routes.Run(cfg.Port)
 }
 
-func initDepedencies(db *sql.DB, rd *redis.Client, k *kafkaBroker.KafkaConsumer) *routes.Routes {
+func initDepedencies(cfg *config.Config, db *sql.DB, rd *redis.Client, k *kafkaBroker.KafkaConsumer) *routes.Routes {
 	orderRepo := repository.NewOrderRepository(db)
 	redisRepo := redisRepo.NewBookingSchedulerService(rd, orderRepo)
 	// / Start Redis Worker in a Goroutine
@@ -56,7 +58,8 @@ func initDepedencies(db *sql.DB, rd *redis.Client, k *kafkaBroker.KafkaConsumer)
 
 	topics := "payOrder"
 	taskWorker := taskKafka.NewTaskWorker(k, orderUsecase, topics)
-	go taskWorker.InitKafka()
+	log.Default().Println("[Info] - Starting Kafka consumer...")
+	go taskWorker.InitKafka(strings.Split(cfg.Kafka.Broker, ","))
 	orderHandler := handlers.NewOrderHandler(orderUsecase)
 
 	return &routes.Routes{

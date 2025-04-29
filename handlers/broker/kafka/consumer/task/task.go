@@ -15,7 +15,7 @@ import (
 
 // Interface untuk inisialisasi Kafka Consumer
 type NotifTaskInterface interface {
-	InitKafka()
+	InitKafka(addrs []string) // Inisialisasi Kafka Consumer
 }
 
 // Struct untuk worker yang menangani task dari Kafka
@@ -38,9 +38,9 @@ func NewTaskWorker(kafka *kafkaBroker.KafkaConsumer, useCase useCase.OrderUsecas
 
 // Fungsi untuk inisialisasi Kafka consumer
 // Fungsi untuk inisialisasi Kafka consumer
-func (p *TaskWorkerImpl) InitKafka() {
+func (p *TaskWorkerImpl) InitKafka(addrs []string) {
 	// Buat Kafka consumer
-	consumer, err := sarama.NewConsumer([]string{"localhost:9092"}, nil) // Ganti dengan broker Kafka Anda
+	consumer, err := sarama.NewConsumer(addrs, nil) // Ganti dengan broker Kafka Anda
 	if err != nil {
 		log.Fatal("Error creating Kafka consumer: ", err)
 	}

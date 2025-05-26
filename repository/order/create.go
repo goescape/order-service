@@ -67,7 +67,7 @@ func (o *orderStore) CreateOrder(ctx context.Context, req *model.CreateOrderReq)
 	for _, item := range req.Items {
 		var stock int64
 		queryStock := `
-			SELECT stock FROM products
+			SELECT qty FROM products
 			WHERE id = $1
 		`
 		err = tx.QueryRowContext(ctx, queryStock, item.ProductId).Scan(&stock)
@@ -83,7 +83,7 @@ func (o *orderStore) CreateOrder(ctx context.Context, req *model.CreateOrderReq)
 		// Update the stock for each product in the order details
 		queryUpdateStock := `
 			UPDATE products
-			SET stock = stock - $1
+			SET qty = qty - $1
 			WHERE id = $2
 		`
 		_, err := tx.ExecContext(ctx, queryUpdateStock, item.Qty, item.ProductId)

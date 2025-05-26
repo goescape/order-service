@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"order-svc/helpers/dbutil"
 	"order-svc/model"
@@ -60,6 +61,36 @@ func (o *orderStore) CreateOrder(ctx context.Context, req *model.CreateOrderReq)
 	if err != nil {
 		log.Default().Println("Failed to insert order details:", err)
 		return nil, err
+	}
+
+	// check if all products exist and have enough stock
+	for _, item := range req.Items {
+		var stock int64
+		queryStock := `
+			SELECT stock FROM products
+			WHERE id = $1
+		`
+		err = tx.QueryRowContext(ctx, queryStock, item.ProductId).Scan(&stock)
+		if err != nil {
+			log.Default().Println("Failed to check product stock:", err)
+			return nil, err
+		}
+		if stock < item.Qty {
+			log.Default().Println("Not enough stock for product:", item.ProductId)
+			return nil, fmt.Errorf("not enough stock for product %s", item.ProductId)
+		}
+
+		// Update the stock for each product in the order details
+		queryUpdateStock := `
+			UPDATE products
+			SET stock = stock - $1
+			WHERE id = $2
+		`
+		_, err := tx.ExecContext(ctx, queryUpdateStock, item.Qty, item.ProductId)
+		if err != nil {
+			log.Default().Println("Failed to update stock:", err)
+			return nil, err
+		}
 	}
 
 	// Commit the transaction

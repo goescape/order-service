@@ -65,7 +65,7 @@ func (o *orderStore) CancelOrder(ctx context.Context, req *model.CancelOrderMode
 	for _, detail := range orderDetails {
 		queryUpdateStock := `
 			UPDATE products
-			SET stock = stock + $1
+			SET qty = qty + $1
 			WHERE id = $2
 		`
 
